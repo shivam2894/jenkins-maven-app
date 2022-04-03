@@ -1,0 +1,3 @@
+Insert into roles values (default,"ROLE_COMPANYOWNER");
+Insert into roles values (default,"ROLE_EMPLOYEE");
+

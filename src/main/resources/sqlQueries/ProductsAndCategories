@@ -1,0 +1,23 @@
+insert into categories values(default,"Clothes");
+insert into categories values(default,"Electronics");
+insert into categories values(default,"Home&Kitchen");
+
+insert into products values(default,10,2,1000,"Gloves",5,"KILOGRAM",1,1);
+insert into products values(default,10,2,15000,"Redmi Note 5 Pro",5,"NUMBER",2,1);
+insert into products values(default,100,5,1500,"Knife",50,"NUMBER",3,1);
+insert into products values(default,100,70,1500,"Cup",50,"NUMBER",3,1);
+insert into products values(default,100,60,1500,"Coaster",50,"NUMBER",3,1);
+
+
+insert into transactions values(default,"2010-01-01","abc","RECEIVED","PURCHASE",1,1);
+insert into transactions values(default,"2020-01-01","xyz","RECEIVED","PURCHASE",1,1);
+insert into transactions values(default,"2021-01-01","hhj","RECEIVED","SALES",1,1);
+insert into transactions values(default,"2019-01-01","kjdjhds","RECEIVED","PURCHASE",1,1);
+insert into transactions values(default,"2011-01-01","gsghsa","RECEIVED","SALES",1,1);
+insert into transactions values(default,"2020-05-01","asda","RECEIVED","PURCHASE",1,1);
+
+insert into companies values(default,"kwg","A Inc",2,"1111111111");
+insert into companies values(default,"kwg","A2 Inc",2,"1111111111");
+insert into companies values(default,"kwg","A3 Inc",1,"1111111111");
+insert into companies values(default,"kwg","A4 Inc",1,"1111111111");
+insert into companies values(default,"kwg","A5 Inc",1,"1111111111");
