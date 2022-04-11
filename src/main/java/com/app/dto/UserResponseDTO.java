@@ -22,6 +22,8 @@ public class UserResponseDTO {
 	private boolean active;
 	
 	private Company company;
+	
+	private String resetPasswordToken;
 		
 	private Set<Role> roles = new HashSet<>();
 

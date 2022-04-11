@@ -2,19 +2,27 @@ package com.app.service;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.app.custom_exceptions.InvalidTokenException;
+import com.app.custom_exceptions.ResourceNotFoundException;
 import com.app.dao.CompanyRepository;
 import com.app.dao.RoleRepository;
 import com.app.dao.UserRepository;
+import com.app.dto.ChangePasswordDTO;
+import com.app.dto.EmployeeDTO;
 import com.app.dto.SignUpRequest;
+import com.app.dto.UserInfoDTO;
 import com.app.dto.UserResponseDTO;
 import com.app.pojos.Company;
 import com.app.pojos.Role;
@@ -69,6 +77,7 @@ public class UserServiceImpl implements IUserService {
 				.collect(Collectors.toSet());
 		user.setRoles(roles);
 		user.setActive(true);
+		user.setResetPasswordToken(null);
 		User persistentUser = userRepo.save(user);// persisted user details in db
 		UserResponseDTO dto = new UserResponseDTO();
 		BeanUtils.copyProperties(persistentUser, dto);// for sending resp : copied User--->User resp DTO
@@ -77,7 +86,7 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public UserResponseDTO inviteUser(SignUpRequest request, Principal principal) {
+	public User inviteUser(SignUpRequest request, Principal principal) {
 		// create User from request payload, case: when company already exists
 //		{
 //		    "userName": "NattuKaka",
@@ -98,7 +107,7 @@ public class UserServiceImpl implements IUserService {
 		user.setDob(LocalDate.parse(request.getDob()));
 
 		User ownerInfo = userRepo.findByUserName(principal.getName())
-				.orElseThrow(() -> new RuntimeException("Company Owner information not found!!"));
+				.orElseThrow(() -> new ResourceNotFoundException("Company Owner information not found!!"));
 
 		user.setCompany(ownerInfo.getCompany());
 
@@ -109,17 +118,91 @@ public class UserServiceImpl implements IUserService {
 				.collect(Collectors.toSet());
 		user.setRoles(roles);
 		user.setActive(true);
+		user.setResetPasswordToken(null);
 		User persistentUser = userRepo.save(user);// persisted user details in db
-		UserResponseDTO dto = new UserResponseDTO();
-		BeanUtils.copyProperties(persistentUser, dto);// for sending resp : copied User--->User resp DTO
-		System.out.println(dto);
-		return dto;
+		
+		return persistentUser;
 
 	}
 
 	@Override
 	public User getUserByUsername(String username) {
-		return userRepo.findByUserName(username).orElseThrow(() -> new RuntimeException("User not found"));
+		return userRepo.findByUserName(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+	}
+
+	@Override
+	public List<EmployeeDTO> getAllEmployees(int pNo, Principal principal) {
+		User user = userRepo.findByUserName(principal.getName())
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		List<User> listUsers = userRepo.findByCompany(user.getCompany(), PageRequest.of(pNo, 10)); //
+		listUsers.stream().forEach(u -> System.out.println(u.getUserName()));
+		return listUsers.stream().filter(u -> u.getId() != user.getId()).map(u -> new EmployeeDTO(u))
+				.collect(Collectors.toList());
+
+	}
+
+	@Override
+	public void deleteEmployeeByName(String userName) {
+		userRepo.deleteByUserName(userName);
+	}
+
+	@Override
+	public User changePassword(ChangePasswordDTO obj, Principal principal) {
+		User user = userRepo.findByUserName(principal.getName())
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		if (!encoder.matches(obj.getOldPassword(), user.getPassword()))
+			throw new BadCredentialsException("Old Password did not match.");
+		user.setPassword(encoder.encode(obj.getNewPassword()));
+		User savedUser = userRepo.save(user);
+		return savedUser;
+	}
+
+	@Override
+	public void changeInfo(UserInfoDTO newInfo, Principal principal) {
+		LocalDate dateOfBirth = LocalDate.parse(newInfo.getDob());
+		User user = userRepo.findByUserName(principal.getName())
+				.orElseThrow(() -> new ResourceNotFoundException("User not found for username : "+ principal.getName()));
+		user.setDob(dateOfBirth);
+		user.setEmail(newInfo.getEmail());
+		user.setName(newInfo.getName());
+		userRepo.save(user);
+	}
+	
+	@Override
+	public User updateResetPasswordToken(String token, String email) {
+		User user = userRepo.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found for email : " + email));
+
+		user.setResetPasswordToken(token);
+		return userRepo.save(user);
+	}
+	
+	@Override
+    public User getByResetPasswordToken(String token) {
+        return userRepo.findByResetPasswordToken(token).orElseThrow(() -> new InvalidTokenException("Could not reset Password !! Please generate the link again"));
+    }
+	
+	@Override
+	public void updatePassword(User user, String newPassword) {
+		user.setPassword(encoder.encode(newPassword));
+		user.setResetPasswordToken(null);
+		userRepo.save(user);
+	}
+	@Override
+	public boolean checkUsernameExists(String username) {
+
+		if (userRepo.findByUserName(username).get() == null)
+			return false;
+		return true;
+	}
+
+	@Override
+	public boolean checkEmailExists(String email) {
+
+		if (userRepo.findByEmail(email).get() == null)
+			return false;
+		return true;
 	}
 
 }

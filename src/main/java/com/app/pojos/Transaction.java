@@ -39,14 +39,12 @@ public class Transaction extends BaseEntity {
 	@Column(name = "transaction_status", nullable = false, length = 30)
 	private TransactionStatus transactionStatus;
 
-	@Column(name = "last_modified_date", nullable = false)
-	
+	@Column(name = "last_modified_date", nullable = false)	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate lastModifiedDate;
 	
-	@ManyToOne
-	@JoinColumn(name = "company_id", nullable = false)
-	private Company company;
+	@Column(nullable = false, length = 50)
+	private String companyName;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)

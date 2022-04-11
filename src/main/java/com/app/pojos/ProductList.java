@@ -18,17 +18,12 @@ import lombok.NoArgsConstructor;
 public class ProductList {
 	@Column(name="product_count" , nullable=false)
 	private int productCount;
+	
 	@OneToOne
 	@JoinColumn(name = "product_id",nullable=false)
 	private Product  product;
 	
+	@Column(name="product_price" , nullable=false)
+	private double productPrice;
 	
-	@Override
-	public String toString() {
-		return "ProductList [productId=" + product.getId() + ", productCount=" + productCount + "]";
-	}
-	
-
-	
-
 }

@@ -2,44 +2,49 @@ package com.app.service;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.app.dao.CompanyRepository;
+import com.app.custom_exceptions.ResourceNotFoundException;
 import com.app.dao.InvoiceRepository;
 import com.app.dao.ProductRepository;
-import com.app.dao.TransactionRepo;
+import com.app.dao.TransactionRepository;
 import com.app.dao.UserRepository;
+import com.app.dto.ITransactionInvoiceDTO;
+import com.app.dto.MonthChartDataDTO;
 import com.app.dto.ProductListDTO;
 import com.app.dto.TransactionDTO;
+import com.app.dto.TransactionFilterDTO;
 import com.app.dto.TransactionInvoiceDTO;
-import com.app.pojos.Company;
+import com.app.dto.TransactionResponseDTO;
 import com.app.pojos.Invoice;
 import com.app.pojos.Product;
 import com.app.pojos.ProductList;
+import com.app.pojos.Role;
 import com.app.pojos.Transaction;
 import com.app.pojos.TransactionStatus;
 import com.app.pojos.TransactionType;
 import com.app.pojos.User;
+import com.app.pojos.UserRoles;
 
 @Service
 @Transactional
 public class TransactionServiceImpl implements ITransactionService {
 
 	@Autowired
-	TransactionRepo transactionRepo;
+	private TransactionRepository transactionRepo;
 	@Autowired
 	private UserRepository userRepo;
-	@Autowired
-	private CompanyRepository companyRepo;
 	@Autowired
 	private ProductRepository productRepo;
 	@Autowired
@@ -63,97 +68,151 @@ public class TransactionServiceImpl implements ITransactionService {
 	}
 
 	@Override
-	public List<TransactionDTO> getTransactionsByUser(int pNo, String userName) {
+	public TransactionResponseDTO getTransactionsByUser(int pNo, String userName, TransactionFilterDTO filters) {
 		final int PAGE_SIZE = 10;
-		User user = userRepo.findByUserName(userName).orElseThrow(() -> new RuntimeException("User Not Found"));
-		return transactionRepo
-				.findByUser(user, PageRequest.of(pNo, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "lastModifiedDate")))
-				.stream().map(e -> new TransactionDTO(e)).collect(Collectors.toList());
+		User user = userRepo.findByUserName(userName)
+				.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
+		TransactionFilterDTO filtersFound = new TransactionFilterDTO(LocalDate.of(1800, 1, 1), LocalDate.now(),
+				new ArrayList<>(Arrays.asList(TransactionStatus.DISPATCHED, TransactionStatus.NOTRECEIVED,
+						TransactionStatus.RECEIVED, TransactionStatus.NOTDISPATCHED)));
+//		System.out.println(filters);
+		if (filters.getStart() != null) {
+			filtersFound.setStart(filters.getStart());
+		}
+		if (filters.getEnd() != null)
+			filtersFound.setEnd(filters.getEnd());
+		if (filters.getStatus() != null) {
+			filtersFound.setStatus(filters.getStatus());
+		}
+		System.out.println(filtersFound);
+		Slice<Transaction> slice = transactionRepo.findByUserWithFilters(user, filtersFound.getStatus(),
+				filtersFound.getStart(), filtersFound.getEnd(),
+				PageRequest.of(pNo, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "lastModifiedDate")));
+		List<TransactionDTO> tranList = slice.getContent().stream().map(e -> new TransactionDTO(e))
+				.collect(Collectors.toList());
+		int pageNo = slice.getNumber();
+		int numberOfElements = slice.getNumberOfElements();
+		boolean nextExists = slice.hasNext();
+		return new TransactionResponseDTO(tranList, pageNo, numberOfElements, nextExists);
 	}
 
 	@Override
 	public TransactionDTO getTransactionByName(String name, Principal principal) {
 		User user = userRepo.findByUserName(principal.getName())
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
 		Transaction t = transactionRepo.findByTransactionNameAndUser(name, user)
-				.orElseThrow(() -> new RuntimeException("No transactions found for given transaction name"));
+				.orElseThrow(() -> new ResourceNotFoundException("No transactions found for given transaction name"));
 		return new TransactionDTO(t);
 	}
 
 	@Override
 	public TransactionDTO getTransactionByTransactionId(int id) {
-		Transaction t = transactionRepo.findById(id).orElseThrow(() -> new RuntimeException("No transactions found"));
+		Transaction t = transactionRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("No transactions found"));
 		return new TransactionDTO(t);
-	}
-
-	@Override
-	public List<TransactionDTO> getTransactionByCompName(String compName, Principal principal) {
-		User user = userRepo.findByUserName(principal.getName())
-				.orElseThrow(() -> new RuntimeException("User not found"));
-		Company company = companyRepo.findByCompanyName(compName)
-				.orElseThrow(() -> new RuntimeException("Company not found"));
-		return transactionRepo.findByCompanyAndUser(company, user).stream().map(e -> new TransactionDTO(e))
-				.collect(Collectors.toList());
-
-	}
-
-	@Override
-	public List<TransactionDTO> filterTranByDate(LocalDate from_date, LocalDate to_date, int pNo, String userName) {
-		final int PAGE_SIZE = 10;
-		User user = userRepo.findByUserName(userName).orElseThrow(() -> new RuntimeException("User not found"));
-
-		return transactionRepo
-				.filterByDate(user, from_date, to_date,
-						PageRequest.of(pNo, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "lastModifiedDate")))
-				.stream().map(e -> new TransactionDTO(e)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<TransactionDTO> getByTransactionStatus(String status, Principal principal) {
 		User user = userRepo.findByUserName(principal.getName())
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
 		return transactionRepo.findByTransactionStatusAndUser(TransactionStatus.valueOf(status.toUpperCase()), user)
 				.stream().map(e -> new TransactionDTO(e)).collect(Collectors.toList());
 
 	}
 
 	@Override
-	public Invoice createTransactionAndInvoice(TransactionInvoiceDTO tranDTO, Principal principal) {
+	public void createTransactionAndInvoice(TransactionInvoiceDTO tranDTO, Principal principal) {
 		User user = userRepo.findByUserName(principal.getName())
-				.orElseThrow(() -> new RuntimeException("User not found"));
-		Optional<Company> company = companyRepo.findByCompanyName(tranDTO.getCompanyName());
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
 
+		// creating a transaction
 		Transaction trans = new Transaction();
 		trans.setTransactionName(tranDTO.getTransactionName());
 		trans.setTransactionStatus(TransactionStatus.valueOf(tranDTO.getTransactionStatus().toUpperCase()));
 		trans.setTransactionType(TransactionType.valueOf(tranDTO.getTransactionType().toUpperCase()));
-		if (company.isPresent())
-			trans.setCompany(company.get());
-		else
-			trans.setCompany(new Company(tranDTO.getCompanyName(), null, null, user.getCompany().getId()));
+		trans.setCompanyName(tranDTO.getCompanyName());
 		trans.setUser(user);
 		trans.setLastModifiedDate(LocalDate.now());
 
 		Transaction savedTrans = transactionRepo.save(trans);
 
+		// creating invoice
 		List<ProductList> productList = tranDTO.getProductList().stream().map((ProductListDTO p) -> {
 			Product product = productRepo.getById(p.getProductId());
-			return new ProductList(p.getCount(), product);
+			if (tranDTO.getTransactionType().equals("PURCHASE"))
+				product.setStocks(product.getStocks() + p.getCount());
+			else
+				product.setStocks(product.getStocks() - p.getCount());
+			productRepo.save(product);
+			return new ProductList(p.getCount(), product, product.getPrice());
 		}).collect(Collectors.toList());
-		
-		Double totalAmount= productList.stream().map(p-> p.getProduct().getPrice()*p.getProductCount()).mapToDouble(Double::intValue).sum();
-		Invoice invoice = new Invoice(totalAmount,tranDTO.getShippingAddress(),LocalDate.now(),savedTrans,productList);
-		
-		Invoice savedInvoice = invoiceRepo.save(invoice);
-				
-		return savedInvoice;
+
+		Double totalAmount = productList.stream().map(p -> p.getProduct().getPrice() * p.getProductCount())
+				.mapToDouble(Double::intValue).sum();
+		Invoice invoice = new Invoice(totalAmount, tranDTO.getShippingAddress(), LocalDate.now(), savedTrans,
+				productList);
+
+		invoiceRepo.save(invoice);
 	}
-	
+
 	@Override
 	public long countOfTransactions(Principal principal) {
 		User user = userRepo.findByUserName(principal.getName())
-				.orElseThrow(() -> new RuntimeException("User not found")); 
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
 		return transactionRepo.getCount(user);
+	}
+
+	@Override
+	public MonthChartDataDTO transactionValueByMonthAndType(TransactionType transactionType, Principal principal) {
+		User user = userRepo.findByUserName(principal.getName())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
+		MonthChartDataDTO out = new MonthChartDataDTO();
+		LocalDate now = LocalDate.now();
+		LocalDate end = LocalDate.of(now.getYear(), now.getMonthValue(), 1).minusDays(1);
+		LocalDate start = LocalDate.of(end.getYear() - 1, end.getMonth(), 1);
+		List<ITransactionInvoiceDTO> listTransaction = transactionRepo
+				.getTransactionAmountWithMonth(transactionType.name(), user.getId(), start.toString(), end.toString());
+		for (int i = 0; i < 13; i++) {
+			out.getLabels().add(start.plusMonths(i).getMonth() + " " + start.plusMonths(i).getYear());
+		}
+		System.out.println(start);
+		System.out.println(end);
+		listTransaction.forEach(e -> {
+			out.getData().set(out.getLabels().indexOf(e.getMonth().toUpperCase()), e.getAmount());
+		});
+		return out;
+	}
+
+	@Override
+	public void deleteTransactionById(int id) {
+		invoiceRepo.deleteById(id);
+		transactionRepo.deleteById(id);
+	}
+
+	@Override
+	public void updateTransactionStatus(int id, String status) {
+		transactionRepo.updateTransactionStatus(id, status);
 	}
 
 }

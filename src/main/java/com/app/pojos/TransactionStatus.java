@@ -5,5 +5,4 @@ public enum TransactionStatus {
 	NOTRECEIVED,
 	DISPATCHED,
 	NOTDISPATCHED
-
 }

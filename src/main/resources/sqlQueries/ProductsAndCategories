@@ -9,12 +9,14 @@ insert into products values(default,100,70,1500,"Cup",50,"NUMBER",3,1);
 insert into products values(default,100,60,1500,"Coaster",50,"NUMBER",3,1);
 
 
-insert into transactions values(default,"2010-01-01","abc","RECEIVED","PURCHASE",1,1);
-insert into transactions values(default,"2020-01-01","xyz","RECEIVED","PURCHASE",1,1);
-insert into transactions values(default,"2021-01-01","hhj","RECEIVED","SALES",1,1);
-insert into transactions values(default,"2019-01-01","kjdjhds","RECEIVED","PURCHASE",1,1);
-insert into transactions values(default,"2011-01-01","gsghsa","RECEIVED","SALES",1,1);
-insert into transactions values(default,"2020-05-01","asda","RECEIVED","PURCHASE",1,1);
+insert into transactions values(default,"ascxadsda","2010-01-01","abc","RECEIVED","PURCHASE",1);
+insert into transactions values(default,"ascxadsda","2020-01-01","xyz","NOTRECEIVED","PURCHASE",1);
+insert into transactions values(default,"ascxadsda","2021-01-01","hhj","RECEIVED","SALES",1);
+insert into transactions values(default,"ascxadsda","2020-04-01","hhjas","DISPATCHED","SALES",1);
+insert into transactions values(default,"ascxadsda","2020-05-01","asahhj","NOTDISPATCHED","SALES",1);
+insert into transactions values(default,"ascxadsda","2019-01-01","kjdjhds","RECEIVED","PURCHASE",1);
+insert into transactions values(default,"ascxadsda","2011-01-01","gsghsa","RECEIVED","SALES",1);
+insert into transactions values(default,"ascxadsda","2020-05-01","asda","NOTRECEIVED","PURCHASE",1);
 
 insert into companies values(default,"kwg","A Inc",2,"1111111111");
 insert into companies values(default,"kwg","A2 Inc",2,"1111111111");

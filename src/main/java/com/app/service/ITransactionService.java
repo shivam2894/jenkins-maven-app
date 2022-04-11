@@ -1,25 +1,27 @@
 package com.app.service;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.util.List;
 
+import com.app.dto.MonthChartDataDTO;
 import com.app.dto.TransactionDTO;
+import com.app.dto.TransactionFilterDTO;
 import com.app.dto.TransactionInvoiceDTO;
-import com.app.pojos.Invoice;
+import com.app.dto.TransactionResponseDTO;
 import com.app.pojos.Transaction;
-import com.app.pojos.TransactionStatus;
+import com.app.pojos.TransactionType;
 
 public interface ITransactionService {
 	List<Transaction> transactionsByTransactionType(String transactionType);
 	List<Transaction> transactionsByTransactionStatus(String transactionStatus);
 	String saveTransaction(Transaction transaction);
-	List<TransactionDTO> getTransactionsByUser(int pNo,String userName);
+	TransactionResponseDTO getTransactionsByUser(int pNo,String userName,TransactionFilterDTO filters);
 	TransactionDTO getTransactionByName(String name, Principal principal);
 	TransactionDTO getTransactionByTransactionId(int id);
-	List<TransactionDTO> getTransactionByCompName(String compName,Principal principal);
-	List<TransactionDTO> filterTranByDate(LocalDate from_date,LocalDate to_date,int pNo, String userName);
 	List<TransactionDTO> getByTransactionStatus(String status, Principal principal);
-	Invoice createTransactionAndInvoice(TransactionInvoiceDTO tranDTO, Principal principal);
-	public long countOfTransactions(Principal principal);
+	void createTransactionAndInvoice(TransactionInvoiceDTO tranDTO, Principal principal);
+	long countOfTransactions(Principal principal);
+	MonthChartDataDTO transactionValueByMonthAndType(TransactionType transactionType,Principal principal);
+	void deleteTransactionById(int id);
+	void updateTransactionStatus(int id, String status);
 }

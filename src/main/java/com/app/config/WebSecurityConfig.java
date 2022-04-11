@@ -38,24 +38,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		System.out.println(3);
 		// specify our own config
 		// enable cors n disable CSRF
-		http.cors().and().csrf().disable().
-				authorizeRequests()// authorize all requests
-				.antMatchers("/api/products/**","/api/products","/api/invite").hasRole("COMPANYOWNER") //will be changed later acc to different controllers
-				.antMatchers("/api/signin", "/api/signup").permitAll() //shouldn't be changed by anyone
-				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll().and()
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.cors().and().csrf().disable().authorizeRequests()// authorize all requests
+				.antMatchers("/api/user/invite", "/api/user/getAllUsers/**", "/api/products/valuation_by_category",
+						"/api/products/countPerCat", "/api/transactions/type/**")
+				.hasRole("COMPANYOWNER")
+				.antMatchers("/api/user/forgot_password/**","/api/user/reset_password").permitAll()
+				.antMatchers("/api/products/**", "/api/transactions/**", "/api/user/**", "/api/companies/**",
+						"/api/invoice")
+				.hasAnyRole("COMPANYOWNER", "EMPLOYEE")
+				.antMatchers("/api/signin", "/api/signup")
+				.permitAll() // shouldn't be changed by anyone
+				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll().and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
 	}
 
-
-	@Bean 
+	@Bean
 	public PasswordEncoder encoder() {
 		System.out.println(2);
 		return new BCryptPasswordEncoder();
 	}
-
 
 	@Override
 	@Bean

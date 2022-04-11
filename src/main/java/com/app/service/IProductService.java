@@ -2,7 +2,9 @@ package com.app.service;
 
 import java.util.List;
 
+import com.app.dto.ChartDataDTO;
 import com.app.dto.ProductDTO;
+import com.app.dto.ProductResponseDTO;
 import com.app.dto.StockSummaryDTO;
 import com.app.pojos.Category;
 import com.app.pojos.Product;
@@ -12,13 +14,13 @@ public interface IProductService {
 
 	List<Product> getAllProducts();
 
-	Product getProductById(int pId);
+	ProductDTO getProductById(int pId);
 
-	ProductDTO getProductByName(String name, User user);
+	ProductResponseDTO getProductByName(String name, User user, int pageNo);
 
-	List<ProductDTO> getAllProductByCategory(int pNo, Category category, User user);
+	ProductResponseDTO getAllProductByCategory(int pNo, String category, User user);
 
-	List<ProductDTO> getPage(int pNo, String filter, String user);
+	ProductResponseDTO getPage(int pNo, String filter, String user);
 
 	void addProduct(ProductDTO productDTO, User user, Category category);
 	
@@ -31,4 +33,10 @@ public interface IProductService {
 	StockSummaryDTO getStockSummary(User user);
 
 	long countByUser(User user);
+	
+	ChartDataDTO getStockValuationByCategory(User user);
+	
+	ChartDataDTO getProductCountPerCategory(User user);
+	
+	ProductDTO getSingleProductByName(String name, User user);
 }

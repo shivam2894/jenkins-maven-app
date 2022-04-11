@@ -17,9 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.custom_exceptions.ResourceNotFoundException;
+import com.app.dao.UserRepository;
 import com.app.dto.ProductDTO;
 import com.app.pojos.Category;
+import com.app.pojos.Role;
 import com.app.pojos.User;
+import com.app.pojos.UserRoles;
 import com.app.service.ICategoryService;
 import com.app.service.IProductService;
 import com.app.service.IUserService;
@@ -38,11 +42,8 @@ public class ProductController {
 	@Autowired
 	private ICategoryService categoryService;
 	
-	@GetMapping
-	public ResponseEntity<?> fetchAllProducts(){
-		System.out.println("in fetch all products");
-		return new ResponseEntity<>(productService.getAllProducts(),HttpStatus.OK);
-	}
+	@Autowired
+	private UserRepository userRepo;
 	
 	@GetMapping("/{pId}")
 	public ResponseEntity<?> fetchProductById(@PathVariable int pId){
@@ -60,6 +61,9 @@ public class ProductController {
 	@PostMapping("/add")
 	public ResponseEntity<?> addProduct(@RequestBody ProductDTO productDTO, Principal principal){
 		User user = userService.getUserByUsername(principal.getName());
+		if(!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId()).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
 		Category category = categoryService.addCategoryByName(productDTO.getCategoryName(), user);
 		productService.addProduct(productDTO, user, category);
 		return new ResponseEntity<>(HttpStatus.CREATED);
@@ -93,10 +97,16 @@ public class ProductController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@GetMapping("/name/{pName}")
-	public ResponseEntity<?> fetchProductByName(@PathVariable String pName, Principal principal){
+	@GetMapping("/name/{pName}/{pNo}")
+	public ResponseEntity<?> fetchProductByName(@PathVariable String pName, @PathVariable int pNo, Principal principal){
 		User user = userService.getUserByUsername(principal.getName());
-		return new ResponseEntity<>(productService.getProductByName(pName, user),HttpStatus.OK);
+		return new ResponseEntity<>(productService.getProductByName(pName, user, pNo),HttpStatus.OK);
+	}
+	
+	@GetMapping("/singleproduct/{pName}")
+	public ResponseEntity<?> fetchSingleProductByName(@PathVariable String pName, Principal principal){
+		User user = userService.getUserByUsername(principal.getName());
+		return new ResponseEntity<>(productService.getSingleProductByName(pName, user),HttpStatus.OK);
 	}
 	
 	@GetMapping("/stocksummary")
@@ -104,4 +114,17 @@ public class ProductController {
 		User user = userService.getUserByUsername(principal.getName());
 		return new ResponseEntity<>(productService.getStockSummary(user), HttpStatus.OK);
 	}
+	
+	@GetMapping("/valuation_by_category")
+	public ResponseEntity<?> fetchStockValuationByCategory(Principal principal){
+		User user = userService.getUserByUsername(principal.getName());
+		return new ResponseEntity<>(productService.getStockValuationByCategory(user), HttpStatus.OK);
+	}
+	
+	@GetMapping("/countPerCat")
+	public ResponseEntity<?> fetchCountPerCategory(Principal principal){
+		User user = userService.getUserByUsername(principal.getName());
+		return new ResponseEntity<>(productService.getProductCountPerCategory(user), HttpStatus.OK);
+	}
+	
 }

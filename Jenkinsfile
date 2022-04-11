@@ -7,7 +7,7 @@ pipeline {
 				sh "docker image save -o maven-app.tar backend1"
             }
         }
-        stage("Send tar file to React-frontend server") {
+        stage("Send tar file to Java-backend server") {
             steps {
 				sh "scp -i /key/cdac.pem maven-app.tar ubuntu@34.211.143.214:/home/ubuntu/"
                 sh "ssh -i /key/cdac.pem ubuntu@34.211.143.214 -yes  sudo docker load < maven-app.tar"              

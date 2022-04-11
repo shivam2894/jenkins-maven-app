@@ -23,15 +23,7 @@ public class TransactionDTO {
 		this.transactionStatus = transaction.getTransactionStatus().name();
 		this.transactionType = transaction.getTransactionType().name();
 		this.lastModifiedDate = transaction.getLastModifiedDate();
-		this.companyName = transaction.getCompany().getCompanyName();
+		this.companyName = transaction.getCompanyName();
 	}
-	
-//	{
-//		"transactionName":"somename",
-//		"transactionStatus":"somestatus",
-//		"transactionType":"sometype",
-//		"companyName":"somename",
-//		"productList":[{"id":"1","count":"5"},{"id":"2","count":"10"},{"id":"6","count":"15"}],
-//		"shippingAddress":"someaddress"
-//	}
+
 }

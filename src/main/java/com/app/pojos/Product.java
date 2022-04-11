@@ -8,6 +8,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,11 +25,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "products")
+@Table(name = "products",uniqueConstraints = @UniqueConstraint(columnNames = {"product_name","user_id"}))
 @AttributeOverride(name = "id",column = @Column(name="product_id"))
 public class Product extends BaseEntity{
 	
-	@Column(name = "product_name",length = 30,nullable = false)
+	@Column(name = "product_name",nullable = false)
 	@NotBlank
 	private String productName;
 	
@@ -70,6 +71,20 @@ public class Product extends BaseEntity{
 		this.category = category;
 		this.user = user;
 	}
+	
+	public Product(int id, String productName, int stocks, Unit unit, double price, int minStock, int maxStock,
+            Category category, User user) {
+        super();
+        this.setId(id);
+        this.productName = productName;
+        this.stocks = stocks;
+        this.unit = unit;
+        this.price = price;
+        this.minStock = minStock;
+        this.maxStock = maxStock;
+        this.category = category;
+        this.user = user;
+    }
 	
 	@Override
 	public String toString() {

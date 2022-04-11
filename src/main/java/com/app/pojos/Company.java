@@ -5,8 +5,6 @@ package com.app.pojos;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -36,4 +34,13 @@ public class Company extends BaseEntity {
 	
 	@Column(name="contact_of")
 	private int contactOf; 
+	
+	public Company(int id, String companyName, String gstin, String address, int contactOf) {
+        super();
+        this.setId(id);
+        this.companyName = companyName;
+        this.gstin = gstin;
+        this.address = address;
+        this.contactOf = contactOf;
+    }
 }

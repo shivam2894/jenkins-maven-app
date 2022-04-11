@@ -8,6 +8,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
@@ -32,20 +33,19 @@ public class Invoice extends BaseEntity {
 	@Column(name="total_amt",nullable=false)
 	private double totalAmount;
 	
-	@Column(name="shipping_addr",length=50,nullable=false)
+	@Column(name="shipping_addr",length=500,nullable=false)
 	private String shippingAddress;
 	
-	@Column(name="date_time")
+	@Column(name="date")
 	@DateTimeFormat(pattern="yyyy/MM/dd")
 	private LocalDate dateTime;	
 
-	
 	@OneToOne
 	@JoinColumn(name = "transaction_id",nullable=false)
 	@MapsId
 	private Transaction transaction;
 	
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name="product_list" , joinColumns = @JoinColumn(name="transaction_id"))	
 	private List<ProductList> productList = new ArrayList<>();
 

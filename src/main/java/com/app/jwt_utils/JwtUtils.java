@@ -36,6 +36,7 @@ public class JwtUtils {
 				.signWith(SignatureAlgorithm.HS512, jwtSecret) // Signs the constructed JWT using the specified
 																// algorithm with the specified key, producing a
 																// JWS(Json web signature=signed JWT)
+				.claim("role", userPrincipal.getAuthorities())
 
 				// Using token signing algo : HMAC using SHA-512
 				.compact();// Actually builds the JWT and serializes it to a compact, URL-safe string

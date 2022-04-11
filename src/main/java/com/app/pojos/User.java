@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -40,13 +41,17 @@ public class User extends BaseEntity {
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate dob;
 	
+	@Column(name = "reset_password_token",length=40)
+    private String resetPasswordToken;
+	
 	@ManyToOne
 	@JoinColumn(name="company_id",nullable=false)
 	private Company company;
 	
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_roles", 
 	joinColumns = @JoinColumn(name = "user_id"), 
 	inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
+	
 }
