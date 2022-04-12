@@ -1,5 +1,6 @@
 package com.app.service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,9 +42,15 @@ public class ProductServiceImpl implements IProductService {
 	}
 
 	@Override
-	public ProductDTO getProductById(int pId) {
+	public ProductDTO getProductById(int pId, Principal principal) {
 		// TODO Auto-generated method stub
-		Product product = productRepo.findById(pId)
+		User user = userRepo.findByUserName(principal.getName())
+				.orElseThrow(() -> new ResourceNotFoundException("user not found"));
+		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
+		Product product = productRepo.findByIdAndUser(pId,user)
 				.orElseThrow(() -> new ResourceNotFoundException("Product with ID " + pId + " not found!!!!!!!!!"));
 		return new ProductDTO(product);
 	}

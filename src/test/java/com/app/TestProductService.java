@@ -1,8 +1,6 @@
 package com.app;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
-import com.app.custom_exceptions.ResourceNotFoundException;
 import com.app.dao.CategoryRepository;
 import com.app.dao.CompanyRepository;
 import com.app.dao.ProductRepository;
@@ -50,30 +47,6 @@ class TestProductService {
 	@MockBean
 	private CategoryRepository catRepo;
 
-	@Test
-	void testGetProductById() {
-		int id = 1;
-		when(productRepo.findById(id)).thenReturn(
-				Optional.of(new Product(id, "gloves", 10, Unit.NUMBER, 100.0, 5, 20, new Category(), new User())));
-		assertEquals("gloves", productService.getProductById(id).getProductName());
-	}
-
-	@Test
-	void testGetProductById2() {
-		int id = 1;
-		when(productRepo.findById(id)).thenReturn(
-				Optional.of(new Product(id, "gloves", 10, Unit.NUMBER, 100.0, 5, 20, new Category(), new User())));
-		assertNotEquals("sunglass", productService.getProductById(id).getProductName());
-	}
-
-	@Test
-	void testGetProductById3() {
-		int id = 1;
-		when(productRepo.findById(id)).thenReturn(
-				Optional.of(new Product(id, "gloves", 10, Unit.NUMBER, 100.0, 5, 20, new Category(), new User())));
-		assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> productService.getProductById(2))
-				.withMessage("Product with ID 2 not found!!!!!!!!!");
-	}
 
 	@Test
 	void testGetAllProductByCategory() {

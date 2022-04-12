@@ -1,5 +1,6 @@
 package com.app.service;
 
+import java.security.Principal;
 import java.util.List;
 
 import com.app.dto.ChartDataDTO;
@@ -14,7 +15,7 @@ public interface IProductService {
 
 	List<Product> getAllProducts();
 
-	ProductDTO getProductById(int pId);
+	ProductDTO getProductById(int pId, Principal principal);
 
 	ProductResponseDTO getProductByName(String name, User user, int pageNo);
 

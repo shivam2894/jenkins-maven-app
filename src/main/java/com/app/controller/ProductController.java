@@ -46,9 +46,9 @@ public class ProductController {
 	private UserRepository userRepo;
 	
 	@GetMapping("/{pId}")
-	public ResponseEntity<?> fetchProductById(@PathVariable int pId){
+	public ResponseEntity<?> fetchProductById(@PathVariable int pId,Principal principal){
 		System.out.println("in fetch all product by id");
-		return new ResponseEntity<>(productService.getProductById(pId),HttpStatus.OK);
+		return new ResponseEntity<>(productService.getProductById(pId,principal),HttpStatus.OK);
 	}
 	
 	@GetMapping("/page/{pNo}/filter/{filter}")

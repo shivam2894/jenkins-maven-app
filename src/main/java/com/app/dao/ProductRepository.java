@@ -21,6 +21,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	Slice<Product> findMatchingProducts(String name, int userId, Pageable pageable);
 
 	Slice<Product> findByUser(User user, Pageable pageable);
+	
+	Optional<Product> findByIdAndUser(int id , User user);
 
 //	List<Product> findByCategoryAndUser(Category category, User user, Pageable pageable);
 	Slice<Product> findByCategoryAndUser(Category category, User user, Pageable pageable);
