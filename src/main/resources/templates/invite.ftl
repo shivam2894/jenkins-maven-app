@@ -22,7 +22,7 @@
                     </tr>
                     <tr>
                         <td style="text-align:center;">
-                          <a href="http://localhost:3000/" title="logo" target="_blank">
+                          <a href="http://3.87.75.52:3000/" title="logo" target="_blank">
                             <img src="https://i.imgur.com/SHVx6u4.png" title="logo" alt="logo">
                           </a>
                         </td>
@@ -49,7 +49,7 @@
 											You can change your password in <strong>Profile Menu</strong> after login.<br>
 											Login to NattuKaka-IMS using the link below.
                                         </p>
-                                        <a href="http://localhost:3000/"
+                                        <a href="http://3.87.75.52:3000/"
                                             style="background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Login Here</a>
 											
 										<p style="color:#455056; font-size:15px;line-height:24px; margin:0;">

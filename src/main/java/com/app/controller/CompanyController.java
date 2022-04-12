@@ -22,7 +22,7 @@ import com.app.service.IUserService;
 
 @RestController
 @RequestMapping("/api/companies")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://3.87.75.52:3000")
 public class CompanyController {
 
 	@Autowired

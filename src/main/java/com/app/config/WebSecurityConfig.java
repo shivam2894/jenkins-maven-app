@@ -46,7 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/api/products/**", "/api/transactions/**", "/api/user/**", "/api/companies/**",
 						"/api/invoice")
 				.hasAnyRole("COMPANYOWNER", "EMPLOYEE")
-				.antMatchers("/api/signin", "/api/signup")
+				.antMatchers("/api/signin", "/api/signup","/usernameCheck/**","/emailCheck/**")
 				.permitAll() // shouldn't be changed by anyone
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);

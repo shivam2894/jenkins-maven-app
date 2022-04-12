@@ -42,7 +42,7 @@ import freemarker.template.TemplateException;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://3.87.75.52:3000")
 public class UserSignupSignInController {
 
 	// auto wire Authentication Manager for user authentication , created in

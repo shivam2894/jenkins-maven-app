@@ -13,7 +13,7 @@ import com.app.service.IInvoiceService;
 
 @RestController
 @RequestMapping("/api/invoice")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://3.87.75.52:3000")
 public class InvoiceController {
 
 	@Autowired

@@ -22,7 +22,7 @@
                     </tr>
                     <tr>
                         <td style="text-align:center;">
-                          <a href="http://localhost:3000/" title="logo" target="_blank">
+                          <a href="http://3.87.75.52:3000/" title="logo" target="_blank">
                             <img src="https://i.imgur.com/SHVx6u4.png" title="logo" alt="logo">
                           </a>
                         </td>
@@ -48,7 +48,7 @@
                                             password has been generated for you. To reset your password, click the
                                             following link and follow the instructions.
                                         </p>
-                                        <a href="http://localhost:3000/changePassword?token=${token}"
+                                        <a href="http://3.87.75.52:3000/changePassword?token=${token}"
                                             style="background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Reset
                                             Password</a>
                                     </td>

@@ -25,42 +25,42 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "products",uniqueConstraints = @UniqueConstraint(columnNames = {"product_name","user_id"}))
-@AttributeOverride(name = "id",column = @Column(name="product_id"))
-public class Product extends BaseEntity{
-	
-	@Column(name = "product_name",nullable = false)
+@Table(name = "products", uniqueConstraints = @UniqueConstraint(columnNames = { "product_name", "user_id" }))
+@AttributeOverride(name = "id", column = @Column(name = "product_id"))
+public class Product extends BaseEntity {
+
+	@Column(name = "product_name", nullable = false)
 	@NotBlank
 	private String productName;
-	
-	@Min(value = 0,message = "stock value can't be negative")
+
+	@Min(value = 0, message = "stock value can't be negative")
 	private int stocks;
-	
+
 	@Enumerated(EnumType.STRING)
 	@NotNull
 	private Unit unit;
-	
-	@Min(value = 0,message = "Price value can't be negative")
+
+	@Min(value = 0, message = "Price value can't be negative")
 	@NotNull
 	@Column(nullable = false)
 	private double price;
-	
-	@Column(name="min_stock")
-	@Min(value = 0,message = "Minimum stock value can't be negative")
+
+	@Column(name = "min_stock")
+	@Min(value = 0, message = "Minimum stock value can't be negative")
 	private int minStock;
-	
-	@Column(name="max_stock")
-	@Min(value = 0,message = "Maximum stock value can't be negative")
+
+	@Column(name = "max_stock")
+	@Min(value = 0, message = "Maximum stock value can't be negative")
 	private int maxStock;
-	
+
 	@ManyToOne
-	@JoinColumn(name = "category_id",nullable = false)
+	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
-	
+
 	@ManyToOne
-	@JoinColumn(name = "user_id",nullable = false)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
-	
+
 	public Product(ProductDTO productDTO, User user, Category category) {
 		this.productName = productDTO.getProductName();
 		this.stocks = productDTO.getStocks();
@@ -88,10 +88,9 @@ public class Product extends BaseEntity{
 	
 	@Override
 	public String toString() {
-		return "Products [id="+getId()+", productName=" + productName + ", category=" + category + ", stocks=" + stocks + ", unit="
-				+ unit + ", price=" + price + ", minStock=" + minStock + ", maxStock=" + maxStock + "]";
+		return "Products [id=" + getId() + ", productName=" + productName + ", category=" + category + ", stocks="
+				+ stocks + ", unit=" + unit + ", price=" + price + ", minStock=" + minStock + ", maxStock=" + maxStock
+				+ "]";
 	}
-	
-	
-	
+
 }

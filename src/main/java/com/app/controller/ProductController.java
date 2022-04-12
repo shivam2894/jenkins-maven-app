@@ -30,7 +30,7 @@ import com.app.service.IUserService;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://3.87.75.52:3000")
 public class ProductController {
 	
 	@Autowired
