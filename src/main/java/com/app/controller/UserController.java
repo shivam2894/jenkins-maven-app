@@ -94,15 +94,21 @@ public class UserController {
 	@PostMapping("/forgot_password/{email}")
 	public ResponseEntity<?> processForgotPassword(@PathVariable String email) {
 
-		String token = RandomString.make(30);
-		User user = userService.updateResetPasswordToken(token, email);
+		String token = RandomString.make(30); // a random String is generated as reset password token using the
+												// RandomString class from the net.bytebuddy.utility package
+		User user = userService.updateResetPasswordToken(token, email); // it updates the reset password token field of
+																		// the user found with the given email,
+																		// otherwise throws an exception whose message
+																		// will be shown up in the forgot password form.
 		Map<String, String> model = new HashMap<>();
 		model.put("customerName", user.getName());
 		model.put("token", token);
-		sendEmail(email,model);
+		sendEmail(email, model);  // it generates a reset password link containing the random token as a URL parameter
 		return new ResponseEntity<>(token, HttpStatus.OK);
 	}
 
+	// handler method in the User controller class to process new password sent from
+	// frontend
 	@PostMapping("/reset_password")
 	public ResponseEntity<?> processResetPassword(@RequestBody ResetPasswordDTO resetPasswordDto) {
 
@@ -111,7 +117,8 @@ public class UserController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	public void sendEmail(String recipientEmail,Map<String, String> model) {
+	// it generates a reset password link containing the random token as a URL parameter and sends the link to user's email
+	public void sendEmail(String recipientEmail, Map<String, String> model) {
 		String to = recipientEmail;
 		String subject = "Password Recovery NattuKaka-InventoryManagement System";
 		MimeMessage message = mailSender.createMimeMessage();
@@ -129,10 +136,10 @@ public class UserController {
 			throw new ResourceNotFoundException(e.getMessage());
 		}
 	}
-	
+
 	@GetMapping("/getUserInfo")
 	public ResponseEntity<?> processResetPassword(Principal principal) {
 		User user = userService.getUserByUsername(principal.getName());
-		return new ResponseEntity<>(new UserInfoDTO(user), HttpStatus.OK);		
+		return new ResponseEntity<>(new UserInfoDTO(user), HttpStatus.OK);
 	}
 }

@@ -193,7 +193,6 @@ public class UserServiceImpl implements IUserService {
 	public boolean checkUsernameExists(String username) {
 
 		return !userRepo.findByUserName(username).isEmpty();
-
 	}
 
 	@Override

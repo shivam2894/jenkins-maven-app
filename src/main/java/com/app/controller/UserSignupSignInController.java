@@ -65,14 +65,14 @@ public class UserSignupSignInController {
 	@Value("${spring.mail.username}")
 	private String email;
 
-	// add end point for user registration
+	//end point for user registration
 	@PostMapping("/signup")
 	public ResponseEntity<?> userRegistration(@RequestBody SignUpRequest request) {
 		System.out.println("in user reg " + request);
 		return ResponseEntity.ok(userService.registerUser(request));
 	}
 
-	// add end point for user authentication
+	//end point for user authentication
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@RequestBody AuthenticationRequest request) {
 		System.out.println("in auth " + request);
@@ -87,7 +87,7 @@ public class UserSignupSignInController {
 
 			// n then pwd n then authorities gets validated)
 			(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
-			// => successful authentication : create JWT n send it to the clnt in the
+			// => successful authentication : create JWT n send it to the client in the
 			// response.
 			System.out.println("auth success " + authenticate);
 			return ResponseEntity.ok(new AuthenticationResponse(jwtUtils.generateJwtToken(authenticate)));
@@ -97,7 +97,7 @@ public class UserSignupSignInController {
 		}
 	}
 
-	// add end point for inviting employee
+	//end point for inviting employee
 	@PostMapping("/invite")
 	public ResponseEntity<?> employeeInvite(@RequestBody SignUpRequest request, Principal principal) {
 		System.out.println("in employee invite " + request);
@@ -107,7 +107,8 @@ public class UserSignupSignInController {
 		BeanUtils.copyProperties(persistentUser, dto);// for sending resp : copied User--->User resp DTO
 		return ResponseEntity.ok(dto);
 	}
-
+	
+	//method to send mail to the invited employee with his credentials
 	public void sendEmail(User user, String textPassword) {
 		Map<String, String> model = new HashMap<>();
 		model.put("customerName", user.getName());
