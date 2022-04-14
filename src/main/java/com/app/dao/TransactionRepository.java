@@ -45,8 +45,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 	Slice<Transaction> findByUserWithFilters(User user, @Param("status") Collection<TransactionStatus> status,
 			LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-	@Query(value = "select Concat(MONTHNAME(last_modified_date),\" \",YEAR(last_modified_date)) as month, total_amt as amount from transactions "
-			+ "join invoice where user_id=:id and transaction_type=:type and last_modified_date Between :start and :end group by month;", nativeQuery = true)
+	@Query(value = "select Concat(MONTHNAME(last_modified_date),\" \",YEAR(last_modified_date)) as month, SUM(total_amt) as amount from transactions "
+			+ "natural join invoice where user_id=:id and transaction_type=:type and last_modified_date Between :start and :end group by month;", nativeQuery = true)
 	List<ITransactionInvoiceDTO> getTransactionAmountWithMonth(String type, @Param("id") int user, String start,
 			String end);
 
