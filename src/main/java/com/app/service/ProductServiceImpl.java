@@ -37,13 +37,11 @@ public class ProductServiceImpl implements IProductService {
 
 	@Override
 	public List<Product> getAllProducts() {
-		// TODO Auto-generated method stub
 		return productRepo.findAll();
 	}
 
 	@Override
 	public ProductDTO getProductById(int pId, Principal principal) {
-		// TODO Auto-generated method stub
 		User user = userRepo.findByUserName(principal.getName())
 				.orElseThrow(() -> new ResourceNotFoundException("user not found"));
 		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
@@ -51,7 +49,7 @@ public class ProductServiceImpl implements IProductService {
 					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 		}
 		Product product = productRepo.findByIdAndUser(pId,user)
-				.orElseThrow(() -> new ResourceNotFoundException("Product with ID " + pId + " not found!!!!!!!!!"));
+				.orElseThrow(() -> new ResourceNotFoundException("Product with ID " + pId + " not found!!"));
 		return new ProductDTO(product);
 	}
 
@@ -59,7 +57,7 @@ public class ProductServiceImpl implements IProductService {
 	public ProductResponseDTO getPage(int pNo, String filter, String userName) {
 		final int PAGE_SIZE = 10;
 		User user = userRepo.findByUserName(userName)
-				.orElseThrow(() -> new ResourceNotFoundException("user not found"));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
 		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
 			user = userRepo.findOwner(user.getCompany().getId())
 					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
@@ -146,6 +144,8 @@ public class ProductServiceImpl implements IProductService {
 		return new ProductResponseDTO(prodList, pageNo, numberOfElements, nextExists);
 	}
 
+	// StockSummaryDTO contains low stock, excess stock , total stock valuation and total count of products
+	
 	@Override
 	public StockSummaryDTO getStockSummary(User user) {
 		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
@@ -165,8 +165,11 @@ public class ProductServiceImpl implements IProductService {
 		return productRepo.countByUser(user);
 	}
 
+	// ChartDataDTO contains data and labels which are compatible with react-chart-js input
+	
 	@Override
 	public ChartDataDTO getStockValuationByCategory(User user) {
+		// Check the role of user
 		if (!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
 			user = userRepo.findOwner(user.getCompany().getId())
 					.orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
@@ -192,6 +195,9 @@ public class ProductServiceImpl implements IProductService {
 		});
 		return out;
 	}
+	
+	// ProductResponseDTO have info about the page we are sending, i.e data, page no , no of elements on current page
+	// and does next page exist
 
 	@Override
 	public ProductResponseDTO getAllProductByCategory(int pNo, String category, User user) {

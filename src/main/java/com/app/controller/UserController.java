@@ -69,9 +69,9 @@ public class UserController {
 		return new ResponseEntity<>(userService.getAllEmployees(pNo, principal), HttpStatus.OK);
 	}
 
-	@DeleteMapping("/delete/{nm}")
-	public ResponseEntity<?> deleteEmployeeById(@PathVariable String nm) {
-		userService.deleteEmployeeByName(nm);
+	@DeleteMapping("/delete/{name}")
+	public ResponseEntity<?> deleteEmployeeByName(@PathVariable String name) {
+		userService.deleteEmployeeByName(name);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

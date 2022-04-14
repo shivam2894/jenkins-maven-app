@@ -19,7 +19,7 @@ import com.app.pojos.TransactionType;
 import com.app.pojos.User;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
-
+	//Pageable :  Spring Data infrastructure will recognizes this parameter automatically to apply pagination and sorting to database.
 	List<Transaction> findByTransactionType(TransactionType type);
 
 	List<Transaction> findByTransactionStatus(TransactionStatus status);
@@ -45,7 +45,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 	Slice<Transaction> findByUserWithFilters(User user, @Param("status") Collection<TransactionStatus> status,
 			LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-	@Query(value = "select Concat(MONTHNAME(last_modified_date),\" \",YEAR(last_modified_date)) as month, Sum(total_amt) as amount from transactions "
+	@Query(value = "select Concat(MONTHNAME(last_modified_date),\" \",YEAR(last_modified_date)) as month, total_amt as amount from transactions "
 			+ "join invoice where user_id=:id and transaction_type=:type and last_modified_date Between :start and :end group by month;", nativeQuery = true)
 	List<ITransactionInvoiceDTO> getTransactionAmountWithMonth(String type, @Param("id") int user, String start,
 			String end);

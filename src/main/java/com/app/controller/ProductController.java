@@ -72,6 +72,9 @@ public class ProductController {
 	@PatchMapping("/edit/{pId}")
 	public ResponseEntity<?> editProduct(@PathVariable int pId, @RequestBody ProductDTO productDTO, Principal principal){
 		User user = userService.getUserByUsername(principal.getName());
+		if(!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId()).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
 		Category category = categoryService.addCategoryByName(productDTO.getCategoryName(), user);
 		productService.editProduct(productDTO, pId, category);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -80,6 +83,9 @@ public class ProductController {
 	@PostMapping("/upload")
 	public ResponseEntity<?> uploadProducts(@RequestBody List<ProductDTO> products, Principal principal){
 		User user = userService.getUserByUsername(principal.getName());
+		if(!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId()).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
 		categoryService.addAllCategories(products.stream().map(p->p.getCategoryName()).collect(Collectors.toList()), user);
 		productService.addProducts(products, user);
 		return new ResponseEntity<>(HttpStatus.CREATED);
@@ -88,6 +94,9 @@ public class ProductController {
 	@GetMapping("/categories")
 	public ResponseEntity<?> getAllCategories(Principal principal){
 		User user = userService.getUserByUsername(principal.getName());
+		if(!user.getRoles().contains(new Role(UserRoles.ROLE_COMPANYOWNER))) {
+			user = userRepo.findOwner(user.getCompany().getId()).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+		}
 		return new ResponseEntity<>(categoryService.getAllCategories(user),HttpStatus.OK);
 	}
 	

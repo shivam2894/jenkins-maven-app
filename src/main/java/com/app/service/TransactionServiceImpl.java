@@ -40,7 +40,10 @@ import com.app.pojos.UserRoles;
 @Service
 @Transactional
 public class TransactionServiceImpl implements ITransactionService {
-
+	
+	//tx boundary => success => session flushed => auto dirty checking =>
+    //returns detached entity
+	
 	@Autowired
 	private TransactionRepository transactionRepo;
 	@Autowired
@@ -67,6 +70,11 @@ public class TransactionServiceImpl implements ITransactionService {
 
 	}
 
+	// TransactionResponseDTO have info about the page we are sending, i.e data, page no , no of elements on current page
+	// and does next page exist
+	
+	// TransactionFilterDTO contains information of all the filters requested
+	
 	@Override
 	public TransactionResponseDTO getTransactionsByUser(int pNo, String userName, TransactionFilterDTO filters) {
 		final int PAGE_SIZE = 10;
@@ -115,7 +123,7 @@ public class TransactionServiceImpl implements ITransactionService {
 				.orElseThrow(() -> new ResourceNotFoundException("No transactions found"));
 		return new TransactionDTO(t);
 	}
-
+	
 	@Override
 	public List<TransactionDTO> getByTransactionStatus(String status, Principal principal) {
 		User user = userRepo.findByUserName(principal.getName())
@@ -178,6 +186,8 @@ public class TransactionServiceImpl implements ITransactionService {
 		}
 		return transactionRepo.getCount(user);
 	}
+	
+	// MonthChartDataDTO contains data and labels which are compatible with react-chart-js input
 
 	@Override
 	public MonthChartDataDTO transactionValueByMonthAndType(TransactionType transactionType, Principal principal) {

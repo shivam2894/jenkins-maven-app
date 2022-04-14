@@ -1,0 +1,47 @@
+#Tomcat server port number 8080
+#server.port=7070
+#context path default value : empty
+#server.servlet.context-path=/spring-mvc-boot
+#DB properties
+spring.datasource.url=jdbc:mysql://localhost:3306/nk?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=root
+# JPA properties
+spring.jpa.show-sql = true
+spring.jpa.hibernate.ddl-auto = update
+#spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL8Dialect
+#logging.level.org.springframework.orm.hibernate5=DEBUG
+
+#Disable open session in view 
+spring.jpa.open-in-view=false
+
+#JWT properties 
+#JWT Secret key for signing n Verification
+SECRET_KEY=mySecretKey1234
+#JWT expiration timeout in msec 24*3600*1000
+EXP_TIMEOUT=86400000
+
+spring.jackson.serialization.fail-on-empty-beans=false
+
+#-------------------Mail Configuration--------------------------
+spring.mail.default-encoding=UTF-8
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+#Enter your mail sender email id and password
+spring.mail.username=inventorymanagement.nattukaka@gmail.com
+spring.mail.password=Abyss123!
+# Other properties
+
+spring.mail.properties.mail.debug=true
+spring.mail.properties.mail.transport.protocol=smtp
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.connectiontimeout=5000
+spring.mail.properties.mail.smtp.timeout=5000
+spring.mail.properties.mail.smtp.writetimeout=5000
+
+# TLS , port 587
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# SSL, post 465
+#spring.mail.properties.mail.smtp.socketFactory.port = 465
+#spring.mail.properties.mail.smtp.socketFactory.class = javax.net.ssl.SSLSocketFactory

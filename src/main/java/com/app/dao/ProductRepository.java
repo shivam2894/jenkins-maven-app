@@ -15,6 +15,8 @@ import com.app.pojos.Product;
 import com.app.pojos.User;
 
 public interface ProductRepository extends JpaRepository<Product, Integer> {
+	//Pageable :  Spring Data infrastructure will recognizes this parameter automatically to apply pagination and sorting to database.
+	
 	Optional<Product> findByProductNameAndUser(String name, User user);
 	
 	@Query(value = "SELECT * FROM products where user_id = :userId and product_name LIKE %:name% ", nativeQuery = true)
