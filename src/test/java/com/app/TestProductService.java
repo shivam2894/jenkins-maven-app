@@ -86,16 +86,6 @@ class TestProductService {
 		assertNotEquals("sunglass", productService.getProductById(id,principal).getProductName());
 	}
 
-	@Test
-	void testGetProductById3() {
-		int id = 1;
-		when(productRepo.findByIdAndUser(id,user)).thenReturn(
-				Optional.of(new Product(id, "gloves", 10, Unit.NUMBER, 100.0, 5, 20, new Category(), new User())));
-		when(userRepo.findByUserName(user.getName())).thenReturn(Optional.of(user));
-		assertThatExceptionOfType(ResourceNotFoundException.class).isThrownBy(() -> productService.getProductById(2,principal))
-				.withMessage("Product with ID 2 not found!!!!!!!!!");
-	}
-
 	
 	@Test
 	void testGetAllProductByCategory() {
